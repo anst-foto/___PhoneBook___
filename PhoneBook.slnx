@@ -1,10 +1,13 @@
 <Solution>
-  <Folder Name="/back/" />
+  <Folder Name="/back/">
+    <File Path="back/.editorconfig" />
+  </Folder>
   <Folder Name="/back/src/">
     <Project Path="back/src/PhoneBook.Lib/PhoneBook.Lib.csproj" />
   </Folder>
   <Folder Name="/editorconfig/">
     <File Path=".editorconfig" />
+    <File Path="back/.editorconfig" />
   </Folder>
   <Folder Name="/git/">
     <File Path=".gitattributes" />
