@@ -1,0 +1,120 @@
+services:
+  postgres:
+    image: postgres:${POSTGRES_VERSION:-18}-alpine
+    container_name: ${NAME}_db
+    command:
+          - "postgres"
+          - "-c"
+          - "max_connections=${PG_MAX_CONNECTIONS:-50}"
+          - "-c"
+          - "shared_buffers=${PG_SHARED_BUFFERS:-1GB}"
+          - "-c"
+          - "effective_cache_size=${PG_EFFECTIVE_CACHE_SIZE:-4GB}"
+          - "-c"
+          - "work_mem=${PG_WORK_MEM:-16MB}"
+          - "-c"
+          - "maintenance_work_mem=${PG_MAINTENANCE_WORK_MEM:-512MB}"
+          - "-c"
+          - "random_page_cost=${PG_RANDOM_PAGE_COST:-1.1}"
+          - "-c"
+          - "temp_file_limit=${PG_TEMP_FILE_LIMIT:-10GB}"
+          - "-c"
+          - "log_min_duration_statement=${PG_LOG_MIN_DURATION:-200ms}"
+          - "-c"
+          - "idle_in_transaction_session_timeout=${PG_IDLE_IN_TRANSACTION_TIMEOUT:-10s}"
+          - "-c"
+          - "lock_timeout=${PG_LOCK_TIMEOUT:-1s}"
+          - "-c"
+          - "statement_timeout=${PG_STATEMENT_TIMEOUT:-60s}"
+          - "-c"
+          - "log_statement=${PG_LOG_STATEMENT:-none}"
+          - "-c"
+          - "shared_preload_libraries=pg_stat_statements"
+          - "-c"
+          - "pg_stat_statements.max=${PG_STAT_STATEMENTS_MAX:-10000}"
+          - "-c"
+          - "pg_stat_statements.track=${PG_STAT_STATEMENTS_TRACK:-all}"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-myapp}
+      POSTGRES_INITDB_ARGS: ${POSTGRES_INITDB_ARGS:-}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-myapp}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    deploy:
+        resources:
+            limits:
+              cpus: '${PG_CPU_LIMIT:-2}'
+              memory: ${PG_MEMORY_LIMIT:-6G}
+            reservations:
+              cpus: '${PG_CPU_RESERVED:-1}'
+              memory: ${PG_MEMORY_RESERVED:-4G}
+    networks:
+      - app_network
+    volumes:
+      - ${POSTGRES_INIT_SCRIPTS_DIR:-./init-scripts}:/docker-entrypoint-initdb.d
+
+
+  flyway:
+    image: flyway/flyway:${FLYWAY_VERSION:-15}
+    container_name: ${NAME}_flyway
+    command: -url=jdbc:postgresql://${NAME}_db:5432/${POSTGRES_DB} 
+             -user=${POSTGRES_USER} 
+             -password=${POSTGRES_PASSWORD} 
+             -placeholders.environment=${FLYWAY_ENVIRONMENT:-dev}
+             -outOfOrder=${FLYWAY_OUT_OF_ORDER:-false}
+             -validateOnMigrate=${FLYWAY_VALIDATE_ON_MIGRATE:-true}
+             migrate
+    volumes:
+      - ${FLYWAY_MIGRATIONS_DIR:-./flyway/sql}:/flyway/sql
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: on-failure
+    deploy:
+      resources:
+        limits:
+          cpus: '${FLYWAY_CPU_LIMIT:-0.25}'
+          memory: ${FLYWAY_MEMORY_LIMIT:-512M}
+        reservations:
+          cpus: '${FLYWAY_CPU_RESERVED:-0.1}'
+          memory: ${FLYWAY_MEMORY_RESERVED:-256M}
+    networks:
+      - app_network
+    profiles:
+      - migration
+
+  pgadmin:
+    image: dpage/pgadmin4:${PGADMIN_VERSION:-latest}
+    container_name: ${NAME}_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: ${PGADMIN_SERVER_MODE:-\"False\"}
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '${PGADMIN_CPU_LIMIT:-0.5}'
+          memory: ${PGADMIN_MEMORY_LIMIT:-1G}
+        reservations:
+          cpus: '${PGADMIN_CPU_RESERVED:-0.25}'
+          memory: ${PGADMIN_MEMORY_RESERVED:-512M}
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
