@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/back/" />
+  <Folder Name="/back/src/">
+    <Project Path="back/src/PhoneBook.Lib/PhoneBook.Lib.csproj" />
+  </Folder>
   <Folder Name="/editorconfig/">
     <File Path=".editorconfig" />
   </Folder>
