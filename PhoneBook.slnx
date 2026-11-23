@@ -5,6 +5,11 @@
   <Folder Name="/back/src/">
     <Project Path="back/src/PhoneBook.Lib/PhoneBook.Lib.csproj" />
   </Folder>
+  <Folder Name="/docker/">
+    <File Path=".env" />
+    <File Path=".env.example" />
+    <File Path="docker-compose.yaml" />
+  </Folder>
   <Folder Name="/editorconfig/">
     <File Path=".editorconfig" />
     <File Path="back/.editorconfig" />
@@ -12,5 +17,8 @@
   <Folder Name="/git/">
     <File Path=".gitattributes" />
     <File Path=".gitignore" />
+  </Folder>
+  <Folder Name="/items/">
+    <File Path="Directory.Packages.props" />
   </Folder>
 </Solution>
