@@ -21,6 +21,8 @@ public class PhoneBookRepo
             throw new ArgumentNullException(nameof(connectionString));
 
         _connectionString = connectionString;
+
+        Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
     }
 
     public async Task<IReadOnlyCollection<PhoneBookItem>> GetAllAsync(CancellationToken cancellationToken = default)
