@@ -3,6 +3,7 @@
     <File Path="back/.editorconfig" />
   </Folder>
   <Folder Name="/back/src/">
+    <Project Path="back/src/PhoneBook.Lib.Test/PhoneBook.Lib.Test.csproj" />
     <Project Path="back/src/PhoneBook.Lib/PhoneBook.Lib.csproj" />
   </Folder>
   <Folder Name="/docker/">
