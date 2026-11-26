@@ -1,9 +1,48 @@
 @host = http://localhost:5126
+@phonebook_api = {{host}}/api/phonebook
+
+###
+# Liveness: процесс жив, зависимости не проверяются.
+GET {{host}}/health
+
+###
+# Readiness: доступна ли БД (PostgreSQL).
+GET {{host}}/ready
 
 ###
 # Получить все записи телефонной книги.
-GET {{host}}/
+GET {{phonebook_api}}
 Accept: application/json
 
 ###
+# Добавить запись.
+POST {{phonebook_api}}
+Content-Type: application/json
+Accept: application/json
 
+{
+  "name": "Ada Lovelace",
+  "phone": "+1-555-0100"
+}
+
+###
+# Проверка валидации: пустое имя → 400 с errors.name.
+POST {{phonebook_api}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "   ",
+  "phone": "+1-555-0100"
+}
+
+###
+# Проверка валидации: пустой телефон → 400 с errors.phone.
+POST {{phonebook_api}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Ada Lovelace",
+  "phone": "   "
+}
