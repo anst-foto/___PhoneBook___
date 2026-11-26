@@ -1,0 +1,9 @@
+@host = http://localhost:5126
+
+###
+# Получить все записи телефонной книги.
+GET {{host}}/
+Accept: application/json
+
+###
+
