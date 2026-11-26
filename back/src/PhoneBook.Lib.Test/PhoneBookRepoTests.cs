@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+
+using PhoneBook.Lib.Models;
 
 using Xunit;
 
@@ -18,9 +21,9 @@ public sealed class PhoneBookRepoTests : IClassFixture<PostgresFixture>
     public async Task GetAllAsync_WhenPhoneBookIsEmpty_ReturnsEmptyCollection()
     {
         await _fixture.ResetDatabaseAsync();
-        var repository = new PhoneBookRepo(_fixture.ConnectionString);
+        PhoneBookRepo repository = new(_fixture.ConnectionString);
 
-        var result = await repository.GetAllAsync();
+        IReadOnlyCollection<PhoneBookItem> result = await repository.GetAllAsync();
 
         Assert.Empty(result);
     }
@@ -29,12 +32,12 @@ public sealed class PhoneBookRepoTests : IClassFixture<PostgresFixture>
     public async Task AddAsync_TrimsValues_PersistsPhoneBookItem_AndReturnsPersonId()
     {
         await _fixture.ResetDatabaseAsync();
-        var repository = new PhoneBookRepo(_fixture.ConnectionString);
+        PhoneBookRepo repository = new(_fixture.ConnectionString);
 
-        var personId = await repository.AddAsync("  Ada Lovelace  ", "  +1-555-0100  ");
-        var result = await repository.GetAllAsync();
+        int personId = await repository.AddAsync("  Ada Lovelace  ", "  +1-555-0100  ");
+        IReadOnlyCollection<PhoneBookItem> result = await repository.GetAllAsync();
 
-        var item = Assert.Single(result);
+        PhoneBookItem item = Assert.Single(result);
         Assert.Equal(personId, item.Id);
         Assert.Equal("Ada Lovelace", item.Name);
         Assert.Equal("+1-555-0100", item.PhoneNumber);
@@ -49,10 +52,10 @@ public sealed class PhoneBookRepoTests : IClassFixture<PostgresFixture>
         string expectedParameterName)
     {
         await _fixture.ResetDatabaseAsync();
-        var repository = new PhoneBookRepo(_fixture.ConnectionString);
+        PhoneBookRepo repository = new(_fixture.ConnectionString);
 
-        var exception = await Assert.ThrowsAsync<ArgumentNullException>(
-            () => repository.AddAsync(name, phone));
+        ArgumentNullException exception =
+            await Assert.ThrowsAsync<ArgumentNullException>(() => repository.AddAsync(name, phone));
 
         Assert.Equal(expectedParameterName, exception.ParamName);
     }

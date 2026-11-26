@@ -1,27 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-        <ImplicitUsings>disable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <IsPackable>false</IsPackable>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Npgsql" />
-      <PackageReference Include="Dapper" />
+  <ItemGroup>
+    <PackageReference Include="Npgsql"/>
+    <PackageReference Include="Dapper"/>
 
-      <PackageReference Include="Microsoft.NET.Test.Sdk" />
-      <PackageReference Include="Testcontainers.PostgreSql" />
-      <PackageReference Include="xunit" />
-      <PackageReference Include="xunit.runner.visualstudio">
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        <PrivateAssets>all</PrivateAssets>
-      </PackageReference>
-    </ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk"/>
+    <PackageReference Include="Testcontainers.PostgreSql"/>
+    <PackageReference Include="xunit"/>
+    <PackageReference Include="xunit.runner.visualstudio">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\PhoneBook.Lib\PhoneBook.Lib.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PhoneBook.Lib\PhoneBook.Lib.csproj"/>
+  </ItemGroup>
 
 </Project>
