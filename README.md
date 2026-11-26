@@ -1,6 +1,5 @@
 # `README.md` (в корне репозитория)
 
-````markdown
 # PhoneBook
 
 Демонстрационный full-stack проект «Телефонная книга»: REST API на ASP.NET Core (Minimal API) + PostgreSQL + React-фронтенд. Включает слой аудита DDL/DML на уровне БД, интеграционные тесты на реальном PostgreSQL и CI.
