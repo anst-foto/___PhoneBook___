@@ -34,7 +34,7 @@ public sealed class PostgresFixture : IAsyncLifetime
         await connection.OpenAsync();
 
         const string sql = """
-                           DROP VIEW IF EXISTS view_phonebook;
+                           DROP VIEW IF EXISTS view_phones;
                            DROP TABLE IF EXISTS table_phones;
                            DROP TABLE IF EXISTS table_persons;
 
@@ -51,10 +51,10 @@ public sealed class PostgresFixture : IAsyncLifetime
                                number TEXT NOT NULL CHECK (btrim(number) <> '')
                            );
 
-                           CREATE VIEW view_phonebook AS
-                               SELECT table_phones.id AS "Id",
-                                      table_persons.name AS "Name",
-                                      table_phones.number AS "PhoneNumber"
+                           CREATE VIEW view_phones AS
+                               SELECT table_phones.id AS "id",
+                                      table_persons.name AS "name",
+                                      table_phones.number AS "number"
                                FROM table_phones
                                JOIN table_persons ON table_phones.person_id = table_persons.id;
                            """;

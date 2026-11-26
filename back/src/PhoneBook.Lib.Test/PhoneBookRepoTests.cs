@@ -40,7 +40,7 @@ public sealed class PhoneBookRepoTests : IClassFixture<PostgresFixture>
         PhoneBookItem item = Assert.Single(result);
         Assert.Equal(personId, item.Id);
         Assert.Equal("Ada Lovelace", item.Name);
-        Assert.Equal("+1-555-0100", item.PhoneNumber);
+        Assert.Equal("+1-555-0100", item.Number);
     }
 
     [Theory]
