@@ -10,9 +10,9 @@
 # The above will handle all files NOT found below
 #
 
-*.cs     text diff=csharp
-*.cshtml text diff=html
-*.csx    text diff=csharp
+*.cs     text eol=crlf diff=csharp
+*.cshtml text eol=crlf diff=html
+*.csx    text eol=crlf diff=csharp
 *.slnx   text eol=crlf
 
 # Content below from: https://github.com/gitattributes/gitattributes/blob/master/Common.gitattributes
