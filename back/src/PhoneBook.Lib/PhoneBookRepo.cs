@@ -32,7 +32,7 @@ public class PhoneBookRepo
         await using NpgsqlConnection connection = new(_connectionString);
         await connection.OpenAsync(cancellationToken);
 
-        const string sql = "SELECT * FROM view_phonebook";
+        const string sql = "SELECT * FROM view_phones";
         IEnumerable<PhoneBookItem> result = await connection.QueryAsync<PhoneBookItem>(sql, cancellationToken);
 
         return result.AsList();
