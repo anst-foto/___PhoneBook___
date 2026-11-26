@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master, develop ]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '10.0.x'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_NOLOGO: true
+
+jobs:
+  format:
+    name: Format Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v5
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.Packages.props') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore
+        run: dotnet restore PhoneBook.slnx
+
+      - name: Verify formatting
+        run: dotnet format PhoneBook.slnx --verify-no-changes --no-restore --verbosity diagnostic
+
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v5
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.Packages.props') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Cache Testcontainers Docker images
+        uses: actions/cache@v5
+        with:
+          path: ~/docker-cache
+          key: ${{ runner.os }}-testcontainers-postgres-18-alpine
+          restore-keys: |
+            ${{ runner.os }}-testcontainers-
+
+      - name: Load cached Docker images (if present)
+        run: |
+          mkdir -p ~/docker-cache
+          if [ -f ~/docker-cache/postgres-18-alpine.tar ]; then
+            docker load -i ~/docker-cache/postgres-18-alpine.tar
+          fi
+
+      - name: Pull Docker images for Testcontainers (cache miss)
+        run: |
+          if [ ! -f ~/docker-cache/postgres-18-alpine.tar ]; then
+            docker pull postgres:18-alpine
+            docker save -o ~/docker-cache/postgres-18-alpine.tar postgres:18-alpine
+          fi
+
+      - name: Verify Docker is available (Testcontainers)
+        run: docker info
+
+      - name: Restore
+        run: dotnet restore PhoneBook.slnx
+
+      - name: Run tests
+        run: >
+          dotnet test PhoneBook.slnx
+          --no-restore
+          --configuration Release
+          --logger "trx;LogFileName=test-results.trx"
+          --collect:"XPlat Code Coverage"
+          --results-directory ./TestResults
+        env:
+          TESTCONTAINERS_RYUK_DISABLED: false
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: test-results
+          path: ./TestResults
